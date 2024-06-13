@@ -1,8 +1,74 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { FaGoogle, FaGithub } from "react-icons/fa";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 export default function Signup() {
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [isError, setIsError] = useState(false);
+  const navigate = useNavigate();
+
+  const errorMessages = {
+    "auth/email-already-in-use": "Email is already in use",
+    "auth/weak-password": "Password is too weak",
+    "auth/invalid-email": "Invalid email format",
+    "auth/operation-not-allowed": "Operation not allowed",
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])/;
+    return passwordRegex.test(password);
+  };
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setAlertMessage("Passwords do not match");
+      setIsError(true);
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setAlertMessage(
+        "Password must contain at least one special character and one number"
+      );
+      setIsError(true);
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      // Update user's display name (name)
+      await updateProfile(userCredential.user, {
+        displayName: name,
+      });
+
+      setAlertMessage("Sign-up successful");
+      setIsError(false);
+      console.log("User created successfully:", userCredential.user);
+
+      // Redirect to login page
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing up: ", error);
+      const errorMessage =
+        errorMessages[error.code] || "An unexpected error occurred";
+      setAlertMessage(errorMessage);
+      setIsError(true);
+    }
+  };
+
   return (
     <div>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -53,7 +119,7 @@ export default function Signup() {
               </span>
             </div>
           </div>
-          <form className="space-y-6" action="#" method="POST">
+          <form className="space-y-6" onSubmit={handleSignUp}>
             <div>
               <div className="mt-2">
                 <input
@@ -61,6 +127,8 @@ export default function Signup() {
                   name="name"
                   type="text"
                   placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
                   className="block w-full rounded-t-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
@@ -72,6 +140,8 @@ export default function Signup() {
                   type="email"
                   autoComplete="email"
                   placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   className="block w-full  border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
@@ -83,6 +153,21 @@ export default function Signup() {
                   type="password"
                   placeholder="Password"
                   autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="block w-full  border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+              <div>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="Confirm Password"
+                  autoComplete="current-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   className="block w-full rounded-b-md border-0 py-1.5 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
@@ -98,6 +183,15 @@ export default function Signup() {
               </button>
             </div>
           </form>
+          {alertMessage && (
+            <p
+              className={`mt-4 text-center text-sm ${
+                isError ? "text-red-500" : "text-green-500"
+              }`}
+            >
+              {alertMessage}
+            </p>
+          )}
           <p className="mt-10 text-center text-sm text-gray-500">
             Already have an account?{" "}
             <Link
