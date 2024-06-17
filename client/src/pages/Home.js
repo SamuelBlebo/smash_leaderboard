@@ -4,6 +4,8 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { useAuth } from "../AuthContext";
 
+import Leaderboard from "./Leaderboard";
+
 export default function Home() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -29,6 +31,8 @@ export default function Home() {
       >
         Logout
       </button>
+
+      <Leaderboard />
     </div>
   );
 }
