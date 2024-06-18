@@ -20,17 +20,18 @@ export default function Home() {
   };
 
   return (
-    <div>
-      <div>Hello, I'm Home</div>
-      {currentUser && (
-        <p>Welcome, {currentUser.displayName || currentUser.email}</p>
-      )}
-      <button
-        onClick={handleLogout}
-        className="mt-4 px-4 py-2 bg-red-600 text-white rounded"
-      >
-        Logout
-      </button>
+    <div className="">
+      <div className="fixed right-0 top-0">
+        {currentUser && (
+          <p>Welcome, {currentUser.displayName || currentUser.email}</p>
+        )}
+        <button
+          onClick={handleLogout}
+          className="mt-4 px-4 py-2 bg-red-600 text-white rounded  "
+        >
+          Logout
+        </button>
+      </div>
 
       <Leaderboard />
     </div>

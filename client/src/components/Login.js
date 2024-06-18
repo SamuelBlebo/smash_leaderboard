@@ -19,6 +19,8 @@ export default function Login() {
     "auth/weak-password": "Password is too weak",
     "auth/invalid-email": "Invalid email format",
     "auth/user-disabled": "User account has been disabled",
+    "auth/too-many-requests":
+      "Too many unsuccessful login attempts. Please try again later.",
   };
 
   const handleSignIn = async (e) => {

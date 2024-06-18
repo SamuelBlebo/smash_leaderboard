@@ -40,6 +40,7 @@ const Leaderboard = () => {
         id: doc.id,
         ...doc.data(),
       }));
+      console.log("Leaderboard Data: ", leaderboardData); // Log the fetched data
       setUsers(leaderboardData);
     });
 
@@ -53,12 +54,16 @@ const Leaderboard = () => {
     }
 
     // Optimistically update the frontend
-    const updatedUsers = users.map((user) => {
+    let updatedUsers = users.map((user) => {
       if (user.id === currentUser.uid) {
         return { ...user, smashes: user.smashes + 1 };
       }
       return user;
     });
+
+    // Sort users by smashes in descending order
+    updatedUsers = updatedUsers.sort((a, b) => b.smashes - a.smashes);
+
     setUsers(updatedUsers);
 
     // Update local count to send to backend
@@ -71,13 +76,13 @@ const Leaderboard = () => {
 
     // Set new timeout for backend update
     const id = setTimeout(() => {
-      updateBackend(localSmashCount + 1); // Pass the current local count to updateBackend
-      setLocalSmashCount(0); // Reset locsal count after sending to backend
-    }, 1000); // Adjust timeout as needed (e.g., 2000ms = 2 seconds)
+      updateBackend(localSmashCount + 1, currentUser.displayName); // Pass the current local count and displayName to updateBackend
+      setLocalSmashCount(0); // Reset local count after sending to backend
+    }, 1500); // Adjust timeout as needed (e.g., 2000ms = 2 seconds)
     setTimeoutId(id);
   };
 
-  const updateBackend = async (count) => {
+  const updateBackend = async (count, displayName) => {
     const userRef = doc(db, "users", currentUser.uid);
 
     try {
@@ -85,10 +90,16 @@ const Leaderboard = () => {
         const userDoc = await transaction.get(userRef);
 
         if (!userDoc.exists()) {
-          transaction.set(userRef, { smashes: count });
+          transaction.set(userRef, {
+            smashes: count,
+            displayName: displayName,
+          });
         } else {
           const newSmashes = userDoc.data().smashes + count;
-          transaction.update(userRef, { smashes: newSmashes });
+          transaction.update(userRef, {
+            smashes: newSmashes,
+            displayName: displayName,
+          });
         }
       });
     } catch (e) {
@@ -99,16 +110,21 @@ const Leaderboard = () => {
   };
 
   return (
-    <div>
-      <h1>Leaderboard</h1>
-      <ul>
+    <div className="h-[100vh] w-[20vw] bg-[#808080] px-[20px] overflow-auto">
+      <h1 className="text-white mt-4 mb-4">Leaderboard</h1>
+      <ul className="space-y-2">
         {users.map((user) => (
-          <li key={user.id}>
-            {user.id}: {user.smashes}
+          <li key={user.id} className="text-white">
+            {user.displayName || "Unknown User"}: {user.smashes}
           </li>
         ))}
       </ul>
-      <button onClick={addSmash}>Add Smash</button>
+      <button
+        onClick={addSmash}
+        className="mt-4 p-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+      >
+        Add Smash
+      </button>
     </div>
   );
 };
