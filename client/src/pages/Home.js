@@ -21,7 +21,7 @@ export default function Home() {
 
   return (
     <div className="">
-      <div className="fixed right-0 top-0">
+      {/* <div className="fixed right-0 top-0">
         {currentUser && (
           <p>Welcome, {currentUser.displayName || currentUser.email}</p>
         )}
@@ -31,7 +31,7 @@ export default function Home() {
         >
           Logout
         </button>
-      </div>
+      </div> */}
 
       <Leaderboard />
     </div>

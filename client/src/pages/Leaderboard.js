@@ -11,6 +11,8 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
+import { LuPanelLeftClose } from "react-icons/lu";
+
 const Leaderboard = () => {
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
@@ -110,21 +112,41 @@ const Leaderboard = () => {
   };
 
   return (
-    <div className="h-[100vh] w-[20vw] bg-[#808080] px-[20px] overflow-auto">
-      <h1 className="text-white mt-4 mb-4">Leaderboard</h1>
-      <ul className="space-y-2">
-        {users.map((user) => (
-          <li key={user.id} className="text-white">
-            {user.displayName || "Unknown User"}: {user.smashes}
-          </li>
-        ))}
-      </ul>
-      <button
-        onClick={addSmash}
-        className="mt-4 p-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-      >
-        Add Smash
-      </button>
+    <div className="flex">
+      <div className="h-[100vh] w-[20vw] bg-[#D6C1AE] px-[30px] overflow-auto">
+        <div className="flex flex-row justify-between items-center my-4">
+          <div>
+            <h1 className="text-white mt-4 mb-4">SMASH</h1>
+          </div>
+          <div>
+            <LuPanelLeftClose size={26} />
+          </div>
+        </div>
+
+        <div className="my-16">
+          <ul className="space-y-2 ">
+            {users.map((user) => (
+              <li
+                key={user.id}
+                className="text-[#202020] bg-[#cab39f]  p-[4px] rounded-md flex justify-between"
+              >
+                <div className="ml-[5px]">
+                  @{user.displayName || "Unknown User"}
+                </div>
+                <div className="mr-[10px]">{user.smashes}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div className="fixed top-[40vh] left-[55vw]">
+        <button
+          onClick={addSmash}
+          className=" h-[160px] w-[300px] mt-4 p-2 bg-[#d6c1ae] text-white font-bold rounded-[40px] hover:bg-[#ccb9a8] "
+        >
+          SMASH HERE
+        </button>
+      </div>
     </div>
   );
 };
