@@ -11,7 +11,8 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
-import { LuPanelLeftClose } from "react-icons/lu";
+import { LuPanelLeft, LuUser } from "react-icons/lu";
+import { BsInfoCircleFill } from "react-icons/bs";
 
 const Leaderboard = () => {
   const [users, setUsers] = useState([]);
@@ -116,10 +117,12 @@ const Leaderboard = () => {
       <div className="h-[100vh] w-[20vw] bg-[#D6C1AE] px-[30px] overflow-auto">
         <div className="flex flex-row justify-between items-center my-4">
           <div>
-            <h1 className="text-white mt-4 mb-4">SMASH</h1>
+            <h1 className="text-[#7c7c7c] text-[25px] mt-4 mb-4 font-[900] e">
+              SMASH
+            </h1>
           </div>
           <div>
-            <LuPanelLeftClose size={26} />
+            <LuPanelLeft size={26} />
           </div>
         </div>
 
@@ -138,11 +141,15 @@ const Leaderboard = () => {
             ))}
           </ul>
         </div>
+        <div className="w-[20vw] absolute bottom-0 left-0 right-0 flex justify-between p-4  shadow-md">
+          <LuUser size={26} />
+          <BsInfoCircleFill size={26} />
+        </div>
       </div>
       <div className="fixed top-[40vh] left-[55vw]">
         <button
           onClick={addSmash}
-          className=" h-[160px] w-[300px] mt-4 p-2 bg-[#d6c1ae] text-white font-bold rounded-[40px] hover:bg-[#ccb9a8] "
+          className=" h-[160px] w-[300px] mt-4 p-2 bg-[#d6c1ae] text-white font-bold italic rounded-[40px] hover:bg-[#ccb9a8] text-[#7c7c7c] "
         >
           SMASH HERE
         </button>
