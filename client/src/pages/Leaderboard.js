@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { db, auth } from "../firebaseConfig";
+import { signOut } from "firebase/auth";
 import {
   collection,
   query,
@@ -19,6 +21,11 @@ const Leaderboard = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [localSmashCount, setLocalSmashCount] = useState(0);
   const [timeoutId, setTimeoutId] = useState(null);
+  const [isPanelVisible, setIsPanelVisible] = useState(true);
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [isInfoCardVisible, setIsInfoCardVisible] = useState(false); // State for info card visibility
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -112,48 +119,143 @@ const Leaderboard = () => {
     }
   };
 
+  const togglePanel = () => {
+    setIsPanelVisible(!isPanelVisible);
+  };
+
+  const togglePopup = () => {
+    setIsPopupVisible(!isPopupVisible);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
+
+  const showInfoCard = () => {
+    setIsInfoCardVisible(true);
+  };
+
+  const hideInfoCard = () => {
+    setIsInfoCardVisible(false);
+  };
+
   return (
     <div className="flex">
-      <div className="h-[100vh] w-[20vw] bg-[#D6C1AE] px-[30px] overflow-auto">
-        <div className="flex flex-row justify-between items-center my-4">
-          <div>
-            <h1 className="text-[#7c7c7c] text-[25px] mt-4 mb-4 font-[900] e">
-              SMASH
-            </h1>
+      {isPanelVisible && (
+        <div className="panel h-[100vh] w-[20vw] bg-[#D6C1AE] px-[30px] overflow-auto">
+          <div className="flex flex-row justify-between items-center my-4">
+            <div>
+              <h1 className="text-[#7c7c7c] text-[25px] mt-4 mb-4 font-[900] e">
+                SMASH
+              </h1>
+            </div>
+            <div>
+              <LuPanelLeft
+                size={26}
+                onClick={togglePanel}
+                style={{ cursor: "pointer" }}
+              />
+            </div>
           </div>
-          <div>
-            <LuPanelLeft size={26} />
-          </div>
-        </div>
 
-        <div className="my-16">
-          <ul className="space-y-2 ">
-            {users.map((user) => (
-              <li
-                key={user.id}
-                className="text-[#202020] bg-[#cab39f]  p-[4px] rounded-md flex justify-between"
-              >
-                <div className="ml-[5px]">
-                  @{user.displayName || "Unknown User"}
-                </div>
-                <div className="mr-[10px]">{user.smashes}</div>
-              </li>
-            ))}
-          </ul>
+          <div className="my-16">
+            <ul className="space-y-2 ">
+              {users.map((user) => (
+                <li
+                  key={user.id}
+                  className="text-[#202020] bg-[#cab39f]  p-[4px] rounded-md flex justify-between"
+                >
+                  <div className="ml-[5px]">
+                    @{user.displayName || "Unknown User"}
+                  </div>
+                  <div className="mr-[10px]">{user.smashes}</div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="w-[20vw] absolute bottom-0 left-0 right-0 flex justify-between p-4 shadow-md">
+            <LuUser
+              size={26}
+              onClick={togglePopup}
+              style={{ cursor: "pointer" }}
+            />
+            <BsInfoCircleFill
+              size={26}
+              onMouseEnter={showInfoCard}
+              onMouseLeave={hideInfoCard}
+              style={{ cursor: "pointer" }}
+            />
+          </div>
+          {isInfoCardVisible && (
+            <div className=" absolute bottom-12 left-4 bg-white p-2  rounded shadow-lg w-[210px]">
+              <p className="text-sm">
+                Smash the big button to compete on the leaderboard.
+              </p>
+            </div>
+          )}
         </div>
-        <div className="w-[20vw] absolute bottom-0 left-0 right-0 flex justify-between p-4  shadow-md">
-          <LuUser size={26} />
-          <BsInfoCircleFill size={26} />
+      )}
+      {!isPanelVisible && (
+        <div className="fixed px-[14px] py-[40px] h-[100vh] bg-[#D6C1AE]">
+          <LuPanelLeft
+            size={26}
+            onClick={togglePanel}
+            style={{ cursor: "pointer" }}
+          />
         </div>
-      </div>
-      <div className="fixed top-[40vh] left-[55vw]">
+      )}
+      <div
+        className={`fixed top-[40vh] ${
+          isPanelVisible ? "left-[45vw]" : "left-[40vw]"
+        }`}
+      >
         <button
           onClick={addSmash}
-          className=" h-[160px] w-[300px] mt-4 p-2 bg-[#d6c1ae] text-white font-bold italic rounded-[40px] hover:bg-[#ccb9a8] text-[#7c7c7c] "
+          className="h-[160px] w-[300px] mt-4 p-2 bg-[#d6c1ae]  font-bold italic rounded-[40px] hover:bg-[#ccb9a8] text-[#7c7c7c] "
         >
           SMASH HERE
         </button>
       </div>
+
+      {isPopupVisible && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-60">
+          <div className="flex flex-col bg-[#d6c3b3] p-10 rounded-[20px] shadow-lg">
+            <h2 className="h-[20vh] w-[25vw] text-xl">User Information</h2>
+            {currentUser ? (
+              <div>
+                <p>
+                  <strong>Username:</strong> {currentUser.displayName}
+                </p>
+                <p>
+                  <strong>Email:</strong> {currentUser.email}
+                </p>
+                <div className="flex justify-between">
+                  {" "}
+                  <button
+                    onClick={handleLogout}
+                    className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  >
+                    Logout
+                  </button>
+                  <button
+                    onClick={togglePopup}
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p>No user is signed in.</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
