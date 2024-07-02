@@ -25,6 +25,10 @@ export default function Signup() {
     return passwordRegex.test(password);
   };
 
+  const formatUsername = (username) => {
+    return username.trim().replace(/\s+/g, "").toLowerCase();
+  };
+
   const handleSignUp = async (e) => {
     e.preventDefault();
 
@@ -49,9 +53,11 @@ export default function Signup() {
         password
       );
 
+      const formattedName = formatUsername(name);
+
       // Update user's display name (name)
       await updateProfile(userCredential.user, {
-        displayName: name,
+        displayName: formattedName,
       });
 
       setAlertMessage("Sign-up successful");
@@ -126,7 +132,7 @@ export default function Signup() {
                   id="name"
                   name="name"
                   type="text"
-                  placeholder="Name"
+                  placeholder="Username"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required

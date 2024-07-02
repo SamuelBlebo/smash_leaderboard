@@ -164,14 +164,17 @@ const Leaderboard = () => {
           </div>
 
           <div className="my-16">
-            <ul className="space-y-2 ">
+            <ul className="space-y-2">
               {users.map((user) => (
                 <li
                   key={user.id}
-                  className="text-[#202020] bg-[#cab39f]  p-[4px] rounded-md flex justify-between"
+                  className="text-[#202020] bg-[#cab39f] p-[4px] rounded-md flex justify-between"
                 >
                   <div className="ml-[5px]">
-                    @{user.displayName || "Unknown User"}
+                    @
+                    {user.displayName
+                      ? user.displayName.toLowerCase().replace(/\s/g, "")
+                      : "unknownuser"}
                   </div>
                   <div className="mr-[10px]">{user.smashes}</div>
                 </li>
