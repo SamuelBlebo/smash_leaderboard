@@ -147,10 +147,10 @@ const Leaderboard = () => {
   return (
     <div className="flex">
       {isPanelVisible && (
-        <div className="panel h-[100vh] w-[20vw] bg-[#D6C1AE] px-[30px] overflow-auto">
+        <div className="panel h-[100vh] w-[100vw] lg:w-[20vw] bg-[#D6C1AE] px-[50px] lg:px-[30px] overflow-auto">
           <div className="flex flex-row justify-between items-center my-4">
             <div>
-              <h1 className="text-[#7c7c7c] text-[25px] mt-4 mb-4 font-[900] e">
+              <h1 className="text-[#7c7c7c] text-[25px] mt-4 llg:mb-4 font-[900] e">
                 SMASH
               </h1>
             </div>
@@ -163,12 +163,14 @@ const Leaderboard = () => {
             </div>
           </div>
 
-          <div className="my-16">
+          <div className="top-[80vh] my-8">
             <ul className="space-y-2">
               {users.map((user) => (
                 <li
                   key={user.id}
-                  className="text-[#202020] bg-[#cab39f] p-[4px] rounded-md flex justify-between"
+                  className={`text-[#202020] bg-[#cab39f] p-[4px] rounded-md flex justify-between ${
+                    user.id === currentUser?.uid ? "bg-green-200" : ""
+                  }`}
                 >
                   <div className="ml-[5px]">
                     @
@@ -181,7 +183,7 @@ const Leaderboard = () => {
               ))}
             </ul>
           </div>
-          <div className="w-[20vw] absolute bottom-0 left-0 right-0 flex justify-between p-4 shadow-md">
+          <div className="lg:w-[20vw] absolute bottom-0 left-0 right-0 flex justify-between p-4 shadow-md">
             <LuUser
               size={26}
               onClick={togglePopup}
@@ -195,7 +197,7 @@ const Leaderboard = () => {
             />
           </div>
           {isInfoCardVisible && (
-            <div className=" absolute bottom-12 left-4 bg-white p-2  rounded shadow-lg w-[210px]">
+            <div className=" absolute bottom-8 lg:left-4 left-28 bg-white p-2  rounded shadow-lg w-[210px]">
               <p className="text-sm">
                 Smash the big button to compete on the leaderboard.
               </p>
@@ -213,13 +215,17 @@ const Leaderboard = () => {
         </div>
       )}
       <div
-        className={`fixed top-[40vh] ${
-          isPanelVisible ? "left-[45vw]" : "left-[40vw]"
+        className={`fixed  lg:top-[40vh]  ${
+          isPanelVisible
+            ? "left-[35vw] lg:left-[45vw] top-[80vh]"
+            : "left-[40vw] top-[50vh] "
         }`}
       >
         <button
           onClick={addSmash}
-          className="h-[160px] w-[300px] mt-4 p-2 bg-[#d6c1ae]  font-bold italic rounded-[40px] hover:bg-[#ccb9a8] text-[#7c7c7c] "
+          className={`lg:h-[160px] lg:w-[300px] mt-4 p-2 md:bg-[#d6c1ae]  ${
+            isPanelVisible ? "bg-[#ffffff]" : "bg-[#d6c1ae] "
+          } font-bold italic  rounded-md lg:rounded-[40px] hover:bg-[#f7eee5] md:hover:bg-[#ccb9a8] text-[#7c7c7c] `}
         >
           SMASH HERE
         </button>
@@ -232,7 +238,8 @@ const Leaderboard = () => {
             {currentUser ? (
               <div>
                 <p>
-                  <strong>Username:</strong> {currentUser.displayName}
+                  <strong>Username:</strong>{" "}
+                  {currentUser.displayName.toLowerCase().replace(/\s/g, "")}
                 </p>
                 <p>
                   <strong>Email:</strong> {currentUser.email}
